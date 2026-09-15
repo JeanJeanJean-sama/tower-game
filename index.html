@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #0f172a;
+    color: #fff;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+  }
+  h2 { margin: 5px 0; font-size: 1.2rem; color: #38bdf8; }
+  p { margin: 0 0 10px 0; font-size: 0.85rem; color: #94a3b8; }
+  
+  #game-container {
+    display: flex;
+    gap: 15px;
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 380px;
+    box-sizing: border-box;
+  }
+
+  .tower {
+    flex: 1;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    min-height: 250px;
+    background: #334155;
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  .floor {
+    height: 45px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.1s, filter 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+
+  .hero {
+    background: #0284c7;
+    border: 2px solid #38bdf8;
+    cursor: default;
+  }
+
+  .enemy {
+    background: #dc2626;
+    border: 2px solid #f87171;
+  }
+
+  .floor:hover:not(.hero) {
+    transform: scale(1.03);
+    filter: brightness(1.2);
+  }
+
+  #message {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 1rem;
+    min-height: 24px;
+  }
+
+  button.reset-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button.reset-btn:hover { background: #059669; }
+</style>
+</head>
+<body>
+
+<h2>⚔️ HERO TOWER WAR</h2>
+<p>自分より「小さい数値」の敵をタップして倒せ！</p>
+
+<div id="game-container">
+  <div class="tower" id="hero-tower">
+    <div class="floor hero" id="hero-floor">🧙‍♂️ ヒーロー: <span id="hero-power">10</span></div>
+  </div>
+  <div class="tower" id="enemy-tower"></div>
+</div>
+
+<div id="message"></div>
+<button class="reset-btn" onclick="initGame()">リセット</button>
+
+<script>
+  let heroPower = 10;
+  let enemies = [];
+
+  function initGame() {
+    heroPower = 10;
+    document.getElementById('hero-power').innerText = heroPower;
+    document.getElementById('message').innerText = '';
+    document.getElementById('message').style.color = '#fff';
+    
+    enemies = [
+      { power: 5, name: '🧌 ゴブリン' },
+      { power: 12, name: 'オーク' },
+      { power: 22, name: '🐉 ドラゴン' },
+      { power: 40, name: '👑 魔王' }
+    ];
+
+    renderTower();
+  }
+
+  function renderTower() {
+    const enemyTower = document.getElementById('enemy-tower');
+    enemyTower.innerHTML = '';
+
+    enemies.forEach((enemy, index) => {
+      const floor = document.createElement('div');
+      floor.className = 'floor enemy';
+      floor.innerText = `${enemy.name}: ${enemy.power}`;
+      floor.onclick = () => attack(index);
+      enemyTower.appendChild(floor);
+    });
+  }
+
+  function attack(index) {
+    const target = enemies[index];
+
+    if (heroPower > target.power) {
+      heroPower += target.power;
+      document.getElementById('hero-power').innerText = heroPower;
+      enemies.splice(index, 1);
+      renderTower();
+
+      if (enemies.length === 0) {
+        document.getElementById('message').innerText = '🎉 クリア！タワーを完全制覇した！';
+        document.getElementById('message').style.color = '#4ade80';
+      } else {
+        document.getElementById('message').innerText = `⚔️ ${target.name} を倒して強くなった！`;
+        document.getElementById('message').style.color = '#38bdf8';
+      }
+    } else {
+      document.getElementById('message').innerText = `💀 敗北... ${target.name} に力及ばず！`;
+      document.getElementById('message').style.color = '#f87171';
+    }
+  }
+
+  initGame();
+</script>
+</body>
+</html>
